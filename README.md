@@ -35,29 +35,35 @@ Designed to track flat occupancies, resident profiles (Owners & Tenants), mainte
 
 ```
 DBMS_Residential_Society_Managment/
-├── database/
-│   ├── schema.sql         # DDL: Relational schema, tables, foreign keys, indexes
-│   ├── seed.sql           # DML: 20 mock flats, residents, maintenance records
-│   ├── mockData.json      # Structured JSON copy for resilient fallback
-│   ├── db.js              # MySQL connection pool & relational query layer
-│   └── init.js            # CLI script to execute schema and seed into MySQL
-├── server/
-│   └── index.js           # Express REST API server & static file host
-├── public/
-│   ├── index.html         # Modern dashboard UI
-│   ├── style.css          # Executive dark glassmorphic styling
-│   └── app.js             # Client-side dynamic controller & SQL runner
-├── .env                   # Database configuration
-├── .env.example           # Environment template
-└── package.json           # Dependencies and run scripts
+├── Presentation-I/        # Presentation 1 Deliverables & Deck
+├── Prsentation-II/        # Presentation 2 Deliverables & Deck
+├── Project_Report/        # Comprehensive Project Documentation
+└── presentation_III/      # Complete Final Source Code & Implementation
+    ├── database/
+    │   ├── schema.sql     # DDL: Relational schema, tables, foreign keys, indexes
+    │   ├── seed.sql       # DML: 20 mock flats, residents, maintenance records
+    │   ├── mockData.json  # Resilient fallback mock data
+    │   ├── db.js          # MySQL connection pool & query layer
+    │   └── init.js        # Automated MySQL database & seed initializer
+    ├── server/
+    │   └── index.js       # Express REST API server & static host
+    ├── public/
+    │   ├── index.html     # Light-themed society dashboard
+    │   ├── style.css      # Design system with collapsible sidebar
+    │   └── app.js         # Client controller & SQL console runner
+    ├── .env               # Database environment config
+    ├── .env.example       # Template environment variables
+    ├── package.json       # Dependencies and npm scripts
+    └── README.md          # Dedicated Presentation III Guide
 ```
 
 ---
 
 ## 🚀 Quick Start Guide
 
-### 1. Install Dependencies
+### 1. Navigate to Presentation III & Install Dependencies
 ```bash
+cd presentation_III
 npm install
 ```
 
