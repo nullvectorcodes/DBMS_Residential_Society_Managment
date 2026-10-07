@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skyline Heights - Residential Society Management & Maintenance Portal</title>
+  <meta name="description" content="Comprehensive residential society management dashboard powered by MySQL. Track maintenance bills, residents directory, flats occupancy, and DBMS relational data.">
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for crisp modern icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- App Container -->
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="app-sidebar">
+      <div class="brand">
+        <div class="brand-left">
+          <div class="brand-icon">
+            <i class="fa-solid fa-building-user"></i>
+          </div>
+          <div class="brand-text">
+            <h2>Skyline Heights</h2>
+            <span class="subtext">Society Management</span>
+          </div>
+        </div>
+        <button class="btn-toggle-sidebar" id="btn-toggle-sidebar" title="Collapse Sidebar">
+          <i class="fa-solid fa-chevron-left" id="sidebar-toggle-icon"></i>
+        </button>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" id="tab-overview" data-target="section-overview" title="Overview">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Overview</span>
+        </button>
+        <button class="nav-item" id="tab-bills" data-target="section-bills" title="Maintenance Bills">
+          <i class="fa-solid fa-receipt"></i>
+          <span>Maintenance Bills</span>
+          <span class="badge-count" id="pending-badge-count">7</span>
+        </button>
+        <button class="nav-item" id="tab-residents" data-target="section-residents" title="Residents Directory">
+          <i class="fa-solid fa-users"></i>
+          <span>Residents Directory</span>
+          <span class="badge-count subtle">20</span>
+        </button>
+        <button class="nav-item" id="tab-flats" data-target="section-flats" title="Flats & Towers">
+          <i class="fa-solid fa-city"></i>
+          <span>Flats & Towers</span>
+        </button>
+        <button class="nav-item" id="tab-dbms" data-target="section-dbms" title="DBMS & SQL Console">
+          <i class="fa-solid fa-database"></i>
+          <span>DBMS & SQL Console</span>
+        </button>
+      </nav>
+
+      <!-- Database Connection Status in Sidebar -->
+      <div class="sidebar-footer">
+        <div class="db-status-card" id="db-status-trigger">
+          <div class="status-indicator">
+            <span class="status-dot" id="status-dot"></span>
+            <span class="status-label" id="status-label">Checking DB...</span>
+          </div>
+          <div class="status-meta" id="status-meta">Host: localhost</div>
+          <button class="btn-config-db" id="btn-open-db-modal" title="MySQL Settings">
+            <i class="fa-solid fa-sliders"></i> <span>MySQL Settings</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Header Bar -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 id="page-title">Society Dashboard Overview</h1>
+          <p class="header-subtitle">Real-time occupancy, billing audits & resident records (20 Verified Units)</p>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn-theme-toggle" id="theme-toggle" title="Switch Theme">
+            <i class="fa-solid fa-moon" id="theme-icon"></i> <span id="theme-text">Dark Mode</span>
+          </button>
+          <div class="quick-time" id="current-datetime">
+            <i class="fa-regular fa-calendar"></i> October 2026 Cycle
+          </div>
+          <button class="btn btn-secondary" id="btn-export-csv">
+            <i class="fa-solid fa-file-arrow-down"></i> Export Audit
+          </button>
+          <button class="btn btn-primary" id="btn-add-resident-trigger">
+            <i class="fa-solid fa-user-plus"></i> New Resident
+          </button>
+        </div>
+      </header>
+
+      <!-- SECTION 1: OVERVIEW -->
+      <section id="section-overview" class="content-section active">
+        <!-- KPI Cards Grid -->
+        <div class="kpi-grid">
+          <!-- Card 1: Total Units & Occupancy -->
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper teal">
+              <i class="fa-solid fa-building-circle-check"></i>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-label">Total Flats / Occupancy</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpi-total-flats">20</span>
+                <span class="kpi-subbadge success" id="kpi-occupancy-rate">100% Occupied</span>
+              </div>
+              <span class="kpi-hint">Across Wing A, B & C (5 Floors)</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Total Residents -->
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper indigo">
+              <i class="fa-solid fa-user-group"></i>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-label">Active Residents</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpi-total-residents">20</span>
+                <span class="kpi-subbadge neutral" id="kpi-owners-tenants-split">14 Owners • 6 Tenants</span>
+              </div>
+              <span class="kpi-hint">All residents KYC mapped</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Total Collected -->
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper emerald">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-label">Maintenance Collected</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value highlight-green" id="kpi-total-collected">₹67,100</span>
+                <span class="kpi-subbadge success" id="kpi-paid-count">13 Paid</span>
+              </div>
+              <span class="kpi-hint">October 2026 Collection (66%)</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Outstanding Dues -->
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper rose">
+              <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-label">Pending & Overdue Dues</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value highlight-rose" id="kpi-total-pending">₹34,800</span>
+                <span class="kpi-subbadge danger" id="kpi-pending-overdue-count">4 Pending • 3 Overdue</span>
+              </div>
+              <span class="kpi-hint">Follow-ups sent via SMS/Email</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle Overview Row: Collection Health & Quick Insights -->
+        <div class="overview-analytics-grid">
+          <!-- Collection Progress Card -->
+          <div class="glass-card collection-progress-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3><i class="fa-solid fa-gauge-high"></i> Maintenance Collection Health</h3>
+                <span class="card-subtitle">October 2026 Total Target: <strong id="overview-total-billed">₹1,01,900</strong></span>
+              </div>
+              <span class="badge badge-pulse" id="overview-rate-badge">66% Collected</span>
+            </div>
+            
+            <div class="progress-bar-container">
+              <div class="multi-progress-bar">
+                <div class="progress-fill fill-paid" id="bar-fill-paid" style="width: 65.8%" title="Paid"></div>
+                <div class="progress-fill fill-pending" id="bar-fill-pending" style="width: 19.8%" title="Pending"></div>
+                <div class="progress-fill fill-overdue" id="bar-fill-overdue" style="width: 14.4%" title="Overdue"></div>
+              </div>
+              <div class="progress-legend">
+                <div class="legend-item"><span class="legend-dot paid"></span> Paid (<span id="legend-paid-val">₹67,100</span>)</div>
+                <div class="legend-item"><span class="legend-dot pending"></span> Pending (<span id="legend-pending-val">₹20,400</span>)</div>
+                <div class="legend-item"><span class="legend-dot overdue"></span> Overdue (<span id="legend-overdue-val">₹14,400</span>)</div>
+              </div>
+            </div>
+
+            <!-- Quick stats tiles -->
+            <div class="mini-metrics-row">
+              <div class="mini-metric">
+                <span class="mini-metric-title">Average Bill</span>
+                <span class="mini-metric-val">₹5,095</span>
+              </div>
+              <div class="mini-metric">
+                <span class="mini-metric-title">Due Date</span>
+                <span class="mini-metric-val">15th Oct 2026</span>
+              </div>
+              <div class="mini-metric">
+                <span class="mini-metric-title">Primary Payment Mode</span>
+                <span class="mini-metric-val">UPI (54%)</span>
+              </div>
+              <div class="mini-metric">
+                <span class="mini-metric-title">DBMS Integrity</span>
+                <span class="mini-metric-val text-success"><i class="fa-solid fa-shield-halved"></i> 3NF Verified</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Attention Needed (Overdue Defaulters) -->
+          <div class="glass-card attention-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3><i class="fa-solid fa-triangle-exclamation text-rose"></i> Defaulters Requiring Action</h3>
+                <span class="card-subtitle">Flats with unpaid dues past grace period</span>
+              </div>
+              <button class="btn btn-xs btn-outline" id="btn-view-all-overdue">View All</button>
+            </div>
+
+            <div class="defaulters-list" id="defaulters-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Payments Stream -->
+        <div class="glass-card recent-payments-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Maintenance Settlements</h3>
+              <span class="card-subtitle">Live audit ledger of recent payments verified</span>
+            </div>
+            <button class="btn btn-sm btn-secondary" id="btn-view-bills-tab">
+              View All 20 Bills <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table" id="recent-payments-table">
+              <thead>
+                <tr>
+                  <th>Flat & Wing</th>
+                  <th>Resident</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Settlement Date</th>
+                  <th>Payment Method</th>
+                  <th>Transaction Ref</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="recent-payments-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: MAINTENANCE BILLS -->
+      <section id="section-bills" class="content-section">
+        <div class="section-toolbar glass-card">
+          <!-- Status Tabs -->
+          <div class="filter-tabs" id="bill-status-filters">
+            <button class="filter-tab active" data-status="ALL">All Bills <span class="tab-badge" id="badge-all-bills">20</span></button>
+            <button class="filter-tab" data-status="PAID">Paid <span class="tab-badge success" id="badge-paid-bills">13</span></button>
+            <button class="filter-tab" data-status="PENDING">Pending <span class="tab-badge warning" id="badge-pending-bills">4</span></button>
+            <button class="filter-tab" data-status="OVERDUE">Overdue <span class="tab-badge danger" id="badge-overdue-bills">3</span></button>
+          </div>
+
+          <!-- Search & Controls -->
+          <div class="toolbar-controls">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="bill-search-input" placeholder="Search flat, resident name, txn ID...">
+            </div>
+            
+            <div class="select-wrapper">
+              <select id="bill-month-filter">
+                <option value="2026-10" selected>October 2026</option>
+                <option value="">All Cycles</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Maintenance Bills Main Table -->
+        <div class="glass-card table-card">
+          <div class="table-responsive">
+            <table class="data-table" id="bills-table">
+              <thead>
+                <tr>
+                  <th>Bill ID</th>
+                  <th>Flat No</th>
+                  <th>Resident Name</th>
+                  <th>Resident Type</th>
+                  <th>Billing Month</th>
+                  <th>Amount (₹)</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Payment Mode</th>
+                  <th>Transaction Ref</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bills-tbody">
+                <!-- Loaded via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: RESIDENTS DIRECTORY -->
+      <section id="section-residents" class="content-section">
+        <div class="section-toolbar glass-card">
+          <!-- Filter Tabs -->
+          <div class="filter-tabs" id="resident-type-filters">
+            <button class="filter-tab active" data-type="ALL">All Residents (20)</button>
+            <button class="filter-tab" data-type="OWNER">Owners (14)</button>
+            <button class="filter-tab" data-type="TENANT">Tenants (6)</button>
+          </div>
+
+          <div class="toolbar-controls">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="resident-search-input" placeholder="Search by name, phone, flat...">
+            </div>
+            <button class="btn btn-primary" id="btn-add-resident-open">
+              <i class="fa-solid fa-user-plus"></i> Add Resident
+            </button>
+          </div>
+        </div>
+
+        <!-- Residents Table -->
+        <div class="glass-card table-card">
+          <div class="table-responsive">
+            <table class="data-table" id="residents-table">
+              <thead>
+                <tr>
+                  <th>Resident ID</th>
+                  <th>Full Name</th>
+                  <th>Flat & Wing</th>
+                  <th>Flat Type</th>
+                  <th>Type</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Move-In Date</th>
+                  <th>Emergency Contact</th>
+                  <th>Maintenance Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="residents-tbody">
+                <!-- Loaded via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: FLATS & TOWERS -->
+      <section id="section-flats" class="content-section">
+        <div class="flats-overview-header">
+          <div>
+            <h2>Society Wings & Units Layout</h2>
+            <p class="subtext">20 Total Flats mapped across 3 Residential Towers</p>
+          </div>
+          <div class="wing-legend">
+            <span class="legend-badge"><i class="fa-solid fa-square text-paid"></i> Paid</span>
+            <span class="legend-badge"><i class="fa-solid fa-square text-pending"></i> Pending</span>
+            <span class="legend-badge"><i class="fa-solid fa-square text-overdue"></i> Overdue</span>
+          </div>
+        </div>
+
+        <div class="wings-container" id="wings-container">
+          <!-- Wing cards populated via JS -->
+        </div>
+      </section>
+
+      <!-- SECTION 5: DBMS ARCHITECTURE & SQL CONSOLE -->
+      <section id="section-dbms" class="content-section">
+        <!-- Relational Model Explanation Card -->
+        <div class="glass-card dbms-architecture-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3><i class="fa-solid fa-diagram-project"></i> Relational Database Management System (3NF Architecture)</h3>
+              <span class="card-subtitle">Built with MySQL relational integrity, primary/foreign keys, and indexes</span>
+            </div>
+            <span class="badge badge-success"><i class="fa-solid fa-check-double"></i> 3NF Normalized</span>
+          </div>
+
+          <div class="dbms-cards-grid">
+            <div class="dbms-entity-card">
+              <div class="entity-title"><i class="fa-solid fa-table"></i> wings</div>
+              <ul class="entity-fields">
+                <li><span class="pk">PK</span> wing_id (INT)</li>
+                <li>wing_name (VARCHAR)</li>
+                <li>total_floors (INT)</li>
+              </ul>
+              <div class="entity-rel">Parent of flats (1:N)</div>
+            </div>
+
+            <div class="dbms-entity-card">
+              <div class="entity-title"><i class="fa-solid fa-table"></i> flats</div>
+              <ul class="entity-fields">
+                <li><span class="pk">PK</span> flat_id (INT)</li>
+                <li><span class="fk">FK</span> wing_id → wings</li>
+                <li>flat_number (VARCHAR)</li>
+                <li>flat_type (ENUM)</li>
+                <li>occupancy_status (ENUM)</li>
+              </ul>
+              <div class="entity-rel">Child of wings, Parent of residents</div>
+            </div>
+
+            <div class="dbms-entity-card">
+              <div class="entity-title"><i class="fa-solid fa-table"></i> residents</div>
+              <ul class="entity-fields">
+                <li><span class="pk">PK</span> resident_id (INT)</li>
+                <li><span class="fk">FK</span> flat_id → flats</li>
+                <li>first_name, last_name (VARCHAR)</li>
+                <li>resident_type ('OWNER', 'TENANT')</li>
+                <li>phone, email (VARCHAR)</li>
+              </ul>
+              <div class="entity-rel">Referenced by maintenance_bills</div>
+            </div>
+
+            <div class="dbms-entity-card highlight-border">
+              <div class="entity-title"><i class="fa-solid fa-table"></i> maintenance_bills</div>
+              <ul class="entity-fields">
+                <li><span class="pk">PK</span> bill_id (INT)</li>
+                <li><span class="fk">FK</span> flat_id → flats</li>
+                <li><span class="fk">FK</span> resident_id → residents</li>
+                <li>billing_month (VARCHAR)</li>
+                <li>amount (DECIMAL)</li>
+                <li>status ('PAID', 'PENDING', 'OVERDUE')</li>
+              </ul>
+              <div class="entity-rel">Unique Constraint: (flat_id, billing_month)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dedicated Guide: How to View Directly in MySQL -->
+        <div class="glass-card mysql-guide-banner">
+          <div class="card-header" style="margin-bottom: 14px;">
+            <div class="card-title-group">
+              <h3><i class="fa-solid fa-terminal" style="color: var(--color-primary);"></i> How to View & Verify this in MySQL Terminal</h3>
+              <span class="card-subtitle">Connect directly to MySQL from your terminal and see the live database updates</span>
+            </div>
+            <button class="btn btn-sm btn-primary" id="btn-open-db-modal-guide">
+              <i class="fa-solid fa-plug"></i> MySQL Settings
+            </button>
+          </div>
+
+          <p style="margin-bottom: 16px; font-size: 0.9rem; line-height: 1.6; color: var(--text-body);">
+            When you mark a resident's bill as paid in this UI, the backend runs an <code>UPDATE maintenance_bills SET status = 'PAID' ...</code> statement directly on MySQL. You can inspect this live in your terminal using the steps below:
+          </p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 6px;">Step 1: Open Terminal & Connect</label>
+              <div class="code-snippet-box">
+                <code>mysql -u root -p</code>
+                <button class="btn-copy-code" data-copy="mysql -u root -p"><i class="fa-regular fa-copy"></i> Copy</button>
+              </div>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 6px;">Step 2: Select Database</label>
+              <div class="code-snippet-box">
+                <code>USE residential_society_db;</code>
+                <button class="btn-copy-code" data-copy="USE residential_society_db;"><i class="fa-regular fa-copy"></i> Copy</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 6px;">Step 3: View Who Paid Maintenance Bills (Run in MySQL)</label>
+            <div class="code-snippet-box" style="align-items: flex-start;">
+              <code style="white-space: pre-wrap; line-height: 1.5;">SELECT f.flat_number, CONCAT(r.first_name, ' ', r.last_name) AS resident, b.amount, b.status, b.payment_date, b.payment_method FROM maintenance_bills b JOIN residents r ON b.resident_id = r.resident_id JOIN flats f ON b.flat_id = f.flat_id;</code>
+              <button class="btn-copy-code" data-copy="SELECT f.flat_number, CONCAT(r.first_name, ' ', r.last_name) AS resident, b.amount, b.status, b.payment_date, b.payment_method FROM maintenance_bills b JOIN residents r ON b.resident_id = r.resident_id JOIN flats f ON b.flat_id = f.flat_id;"><i class="fa-regular fa-copy"></i> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive SQL Query Console -->
+        <div class="glass-card sql-console-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3><i class="fa-solid fa-terminal"></i> Interactive MySQL Query Runner</h3>
+              <span class="card-subtitle">Execute live relational SELECT queries against the database schema</span>
+            </div>
+            <div class="preset-queries-dropdown">
+              <select id="preset-query-select">
+                <option value="">⚡ Select Sample Relational Query...</option>
+                <option value="1">1. View Who Paid Maintenance Bill (JOIN Query)</option>
+                <option value="2">2. Find Defaulters with Overdue Bills & Phone Numbers</option>
+                <option value="3">3. Sum of Maintenance Collected Grouped by Wing</option>
+                <option value="4">4. Full Resident Directory with Flat Area & Move-in Date</option>
+                <option value="5">5. Payment Method Distribution Analysis</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="sql-input-area">
+            <textarea id="sql-query-input" rows="4" spellcheck="false" placeholder="Write your SQL SELECT query here... e.g. SELECT * FROM maintenance_bills;"></textarea>
+            <div class="sql-actions-bar">
+              <span class="sql-tip"><i class="fa-solid fa-circle-info"></i> Supports relational JOINs, GROUP BY, aggregations and WHERE clauses.</span>
+              <button class="btn btn-primary" id="btn-execute-sql">
+                <i class="fa-solid fa-play"></i> Run Query
+              </button>
+            </div>
+          </div>
+
+          <!-- Query Results Display -->
+          <div class="sql-output-container" id="sql-output-container" style="display: none;">
+            <div class="sql-output-meta">
+              <span id="sql-result-status"><i class="fa-solid fa-check"></i> 20 rows returned</span>
+              <span id="sql-execution-time">Query took 2.4 ms</span>
+            </div>
+            <div class="table-responsive sql-table-scroll">
+              <table class="data-table" id="sql-results-table">
+                <thead id="sql-results-thead"></thead>
+                <tbody id="sql-results-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL 1: MARK BILL AS PAID -->
+  <div class="modal-backdrop" id="modal-pay-bill">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-cash-register"></i> Record Maintenance Payment</h3>
+        <button class="btn-close-modal" data-close="modal-pay-bill">&times;</button>
+      </div>
+      <form id="form-pay-bill">
+        <input type="hidden" id="pay-bill-id">
+        <div class="modal-body">
+          <div class="bill-summary-banner" id="pay-bill-summary">
+            <!-- Populated via JS -->
+          </div>
+
+          <div class="form-group">
+            <label for="pay-method">Payment Method *</label>
+            <select id="pay-method" required>
+              <option value="UPI">UPI (Google Pay, PhonePe, Paytm)</option>
+              <option value="NET_BANKING">Net Banking (IMPS / NEFT / RTGS)</option>
+              <option value="CREDIT_CARD">Credit / Debit Card</option>
+              <option value="CASH">Cash Deposit</option>
+              <option value="CHEQUE">Bank Cheque</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="pay-txn-ref">Transaction Reference / UTR Number *</label>
+            <input type="text" id="pay-txn-ref" required placeholder="e.g. UPI-98271038472 or CHQ-004928">
+          </div>
+
+          <div class="form-group">
+            <label for="pay-date">Payment Date *</label>
+            <input type="date" id="pay-date" required>
+          </div>
+
+          <div class="form-group">
+            <label for="pay-notes">Audit Notes</label>
+            <input type="text" id="pay-notes" placeholder="Optional notes (e.g. Cleared at society desk)">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="modal-pay-bill">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Confirm Payment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ADD NEW RESIDENT -->
+  <div class="modal-backdrop" id="modal-add-resident">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-plus"></i> Register New Resident</h3>
+        <button class="btn-close-modal" data-close="modal-add-resident">&times;</button>
+      </div>
+      <form id="form-add-resident">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="res-first-name">First Name *</label>
+              <input type="text" id="res-first-name" required placeholder="e.g. Rahul">
+            </div>
+            <div class="form-group">
+              <label for="res-last-name">Last Name *</label>
+              <input type="text" id="res-last-name" required placeholder="e.g. Varma">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="res-flat-id">Assigned Flat *</label>
+              <select id="res-flat-id" required>
+                <!-- Filled via JS -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="res-type">Resident Type *</label>
+              <select id="res-type" required>
+                <option value="OWNER">Owner</option>
+                <option value="TENANT">Tenant</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="res-phone">Phone Number *</label>
+              <input type="tel" id="res-phone" required placeholder="+91 98765 43210">
+            </div>
+            <div class="form-group">
+              <label for="res-email">Email Address *</label>
+              <input type="email" id="res-email" required placeholder="rahul.v@example.com">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="res-move-in">Move-in Date *</label>
+              <input type="date" id="res-move-in" required>
+            </div>
+            <div class="form-group">
+              <label for="res-emergency">Emergency Contact</label>
+              <input type="tel" id="res-emergency" placeholder="+91 98111 22334">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="modal-add-resident">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Resident</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: MYSQL CONNECTION & SYNC SETTINGS -->
+  <div class="modal-backdrop" id="modal-db-settings">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-database"></i> MySQL Database Connection</h3>
+        <button class="btn-close-modal" data-close="modal-db-settings">&times;</button>
+      </div>
+      <form id="form-db-settings">
+        <div class="modal-body">
+          <div class="db-banner-info">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+              <strong>DBMS Configuration</strong>
+              <p>Connect this portal to your local or remote MySQL server to run native relational queries and load the 20-record dataset.</p>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="db-host">Host</label>
+              <input type="text" id="db-host" value="127.0.0.1" required>
+            </div>
+            <div class="form-group">
+              <label for="db-port">Port</label>
+              <input type="number" id="db-port" value="3306" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="db-user">Username</label>
+              <input type="text" id="db-user" value="root" required>
+            </div>
+            <div class="form-group">
+              <label for="db-pass">Password</label>
+              <input type="password" id="db-pass" placeholder="Enter your MySQL root password">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="db-name">Database Name</label>
+            <input type="text" id="db-name" value="residential_society_db" required>
+          </div>
+
+          <div class="form-checkbox">
+            <input type="checkbox" id="db-init-toggle" checked>
+            <label for="db-init-toggle">Automatically create tables (schema.sql) and populate 20 mock entries (seed.sql)</label>
+          </div>
+
+          <div id="db-sync-feedback" class="sync-feedback" style="display: none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="modal-db-settings">Close</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-db-sync">
+            <i class="fa-solid fa-bolt"></i> Test & Connect MySQL
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
